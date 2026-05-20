@@ -136,18 +136,17 @@ async def main() -> None:
     app.add_handler(CommandHandler("status", status))
 
     logger.info("Starting webhook on port %d …", PORT)
+    logger.info("WEBHOOK_URL=%r", WEBHOOK_URL)
+
     async with app:
-        logger.info("WEBHOOK_URL=%r", WEBHOOK_URL)
-        logger.info("Final webhook=%r", f"{WEBHOOK_URL}/webhook")
-        await app.bot.set_webhook(url=f"{WEBHOOK_URL}/webhook")
         await app.updater.start_webhook(
             listen="0.0.0.0",
             port=PORT,
-            url_path="/webhook",
+            url_path="webhook",
+            webhook_url=f"{WEBHOOK_URL}/webhook",
         )
         await app.start()
         logger.info("Bot is live and listening …")
-        # Keep running forever (works on Python 3.14, unlike idle())
         await asyncio.Event().wait()
 
 if __name__ == "__main__":
