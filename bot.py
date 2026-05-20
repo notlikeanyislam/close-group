@@ -137,6 +137,8 @@ async def main() -> None:
 
     logger.info("Starting webhook on port %d …", PORT)
     async with app:
+        logger.info("WEBHOOK_URL=%r", WEBHOOK_URL)
+        logger.info("Final webhook=%r", f"{WEBHOOK_URL}/webhook")
         await app.bot.set_webhook(url=f"{WEBHOOK_URL}/webhook")
         await app.updater.start_webhook(
             listen="0.0.0.0",
