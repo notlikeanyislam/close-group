@@ -8,6 +8,7 @@ Commands (admins only):
 """
 
 import os
+import asyncio
 import logging
 from telegram import Update, ChatPermissions
 from telegram.ext import (
@@ -104,7 +105,7 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 # ── Entry point ───────────────────────────────────────────────────────────────
 
-def main() -> None:
+async def main() -> None:
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
     app.add_handler(CommandHandler("close",  close_chat))
@@ -112,12 +113,16 @@ def main() -> None:
     app.add_handler(CommandHandler("status", status))
 
     logger.info("Starting webhook on port %d …", PORT)
-    app.run_webhook(
-        listen="0.0.0.0",
-        port=PORT,
-        webhook_url=f"{WEBHOOK_URL}/webhook",
-        url_path="/webhook",
-    )
+    async with app:
+        await app.bot.set_webhook(url=f"{WEBHOOK_URL}/webhook")
+        await app.updater.start_webhook(
+            listen="0.0.0.0",
+            port=PORT,
+            url_path="/webhook",
+        )
+        await app.start()
+        await app.updater.idle()
+        await app.stop()
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
