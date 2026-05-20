@@ -73,7 +73,25 @@ async def not_admin_reply(update: Update) -> None:
 
 # ── Handlers ──────────────────────────────────────────────────────────────────
 
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text(
+        "👋 Hi! I'm a group chat lock bot.\n\n"
+        "Add me to a group, make me an admin with 'Restrict Members' permission, then use:\n\n"
+        "🔒 /close — Lock the chat (members can't send messages)\n"
+        "🔓 /open  — Unlock the chat\n"
+        "📊 /status — Check if the chat is open or closed\n\n"
+        "These commands only work inside a group."
+    )
+
+async def group_only(update: Update) -> bool:
+    if update.effective_chat.type == "private":
+        await update.message.reply_text("⚠️ This command only works inside a group.")
+        return False
+    return True
+
 async def close_chat(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if not await group_only(update):
+        return
     if not await is_admin(update, context):
         await not_admin_reply(update)
         return
@@ -85,6 +103,8 @@ async def close_chat(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         await update.message.reply_text(f"❌ Failed: {e}")
 
 async def open_chat(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if not await group_only(update):
+        return
     if not await is_admin(update, context):
         await not_admin_reply(update)
         return
@@ -96,6 +116,8 @@ async def open_chat(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await update.message.reply_text(f"❌ Failed: {e}")
 
 async def status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if not await group_only(update):
+        return
     try:
         perms = (await context.bot.get_chat(update.effective_chat.id)).permissions
         state = "🔓 OPEN" if (perms and perms.can_send_messages) else "🔒 CLOSED"
@@ -108,6 +130,7 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 async def main() -> None:
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
+    app.add_handler(CommandHandler("start",  start))
     app.add_handler(CommandHandler("close",  close_chat))
     app.add_handler(CommandHandler("open",   open_chat))
     app.add_handler(CommandHandler("status", status))
