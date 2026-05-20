@@ -69,23 +69,23 @@ async def is_admin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> bool:
     return any(admin.user.id == user_id for admin in admins)
 
 async def not_admin_reply(update: Update) -> None:
-    await update.message.reply_text("⛔ Only admins can use this command.")
+    await update.message.reply_text("⛔ يمكن للمسؤولين فقط استخدام هذا الأمر.")
 
 # ── Handlers ──────────────────────────────────────────────────────────────────
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
-        "👋 Hi! I'm a group chat lock bot.\n\n"
-        "Add me to a group, make me an admin with 'Restrict Members' permission, then use:\n\n"
-        "🔒 /close — Lock the chat (members can't send messages)\n"
-        "🔓 /open  — Unlock the chat\n"
-        "📊 /status — Check if the chat is open or closed\n\n"
-        "These commands only work inside a group."
+        "👋 أهلاً! أنا روبوت اغلاق المحادثة الجماعية.\n\n"
+        "أضفني إلى مجموعة، واجعلني مسؤولاً بإذن 'تقييد الأعضاء'، ثم استخدم:\n\n"
+        "🔒 /close — اغلاق المحادثة (لا يمكن للأعضاء إرسال الرسائل)\n"
+        "🔓 /open — فتح المحادثة\n"
+        "📊 /status — تحقق مما إذا كانت المحادثة مفتوحة أم مغلقة\n\n"
+        "تعمل هذه الأوامر داخل المجموعة فقط."
     )
 
 async def group_only(update: Update) -> bool:
     if update.effective_chat.type == "private":
-        await update.message.reply_text("⚠️ This command only works inside a group.")
+        await update.message.reply_text("⚠️ هذا الأمر يعمل فقط داخل المجموعة.")
         return False
     return True
 
@@ -97,7 +97,7 @@ async def close_chat(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         return
     try:
         await context.bot.set_chat_permissions(update.effective_chat.id, CLOSED_PERMISSIONS)
-        await update.message.reply_text("🔒 Chat closed. Use /open to reopen.")
+        await update.message.reply_text("🔒 تم إغلاق المحادثة. استخدم /open لإعادة الفتح.")
         logger.info("Chat %s closed by %s", update.effective_chat.id, update.effective_user.id)
     except Exception as e:
         await update.message.reply_text(f"❌ Failed: {e}")
@@ -110,7 +110,7 @@ async def open_chat(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         return
     try:
         await context.bot.set_chat_permissions(update.effective_chat.id, OPEN_PERMISSIONS)
-        await update.message.reply_text("🔓 Chat opened. Members can send messages again.")
+        await update.message.reply_text("🔓 تم فتح المحادثة. يمكن للأعضاء إرسال الرسائل مرة أخرى!")
         logger.info("Chat %s opened by %s", update.effective_chat.id, update.effective_user.id)
     except Exception as e:
         await update.message.reply_text(f"❌ Failed: {e}")
@@ -120,10 +120,10 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         return
     try:
         perms = (await context.bot.get_chat(update.effective_chat.id)).permissions
-        state = "🔓 OPEN" if (perms and perms.can_send_messages) else "🔒 CLOSED"
-        await update.message.reply_text(f"Chat is currently {state}.")
+        state = "🔓 OPEN" if (perms and perms.can_send_messages) else "🔒 مغلق"
+        await update.message.reply_text(f"الدردشة حاليا {state}.")
     except Exception as e:
-        await update.message.reply_text(f"❌ Could not fetch status: {e}")
+        await update.message.reply_text(f"❌ لم يتمكن من عرض الحالة: {e}")
 
 # ── Entry point ───────────────────────────────────────────────────────────────
 
