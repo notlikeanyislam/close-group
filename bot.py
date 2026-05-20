@@ -135,8 +135,6 @@ async def main() -> None:
     app.add_handler(CommandHandler("open",   open_chat))
     app.add_handler(CommandHandler("status", status))
 
-    logger.info("Starting webhook on port %d …", PORT)
-    logger.info("WEBHOOK_URL=%r", WEBHOOK_URL)
 
     async with app:
         await app.updater.start_webhook(
