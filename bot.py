@@ -144,8 +144,9 @@ async def main() -> None:
             url_path="/webhook",
         )
         await app.start()
-        await app.updater.idle()
-        await app.stop()
+        logger.info("Bot is live and listening …")
+        # Keep running forever (works on Python 3.14, unlike idle())
+        await asyncio.Event().wait()
 
 if __name__ == "__main__":
     asyncio.run(main())
