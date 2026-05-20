@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: telegram-lock-bot
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python bot.py
+    envVars:
+      - key: BOT_TOKEN
+        sync: false        # you'll fill this in on the Render dashboard
+      - key: WEBHOOK_URL
+        sync: false        # you'll fill this in on the Render dashboard
